@@ -79,7 +79,7 @@
     "prettier": "^3.0.3",
     "react": "19.0.0",
     "react-native": "0.79.5",
-    "react-native-builder-bob": "^0.40.12",
+    "react-native-builder-bob": "0.18.3",
     "release-it": "^17.10.0",
     "typescript": "^5.2.2"
   },
@@ -183,5 +183,9 @@
     "languages": "js",
     "type": "library",
     "version": "0.46.0"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "react-native-iap": "^13.0.0"
   }
 }

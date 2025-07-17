@@ -67,6 +67,7 @@ export interface RedeemRewardOfferResponse {
 
 class ApposaurSDK {
   private static instance: ApposaurSDK;
+  // @ts-ignore
   private headers: HeadersInit;
   private activeSubscriptionProductId: string = '';
 
