@@ -1,4 +1,4 @@
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   API_HEADER_KEY,
@@ -100,7 +100,8 @@ class ApposaurSDK {
       }
       await this.validateAPIKey();
       try {
-        this.activeSubscriptionProductId = await this.getActiveSubscriptionProductId();
+        this.activeSubscriptionProductId =
+          await this.getActiveSubscriptionProductId();
       } catch (e) {
         // ignore error
       }
@@ -114,9 +115,8 @@ class ApposaurSDK {
     endpoint: string,
     method: string,
     body?: any,
-    retryCount: number = 2,
+    retryCount: number = 2
   ): Promise<any> {
-    
     try {
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method,
@@ -133,7 +133,7 @@ class ApposaurSDK {
       if (retryCount > 0) {
         console.warn('Request failed, retrying..', error);
         const delay = 500; // 0.5s
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return this.makeRequest(endpoint, method, body, retryCount - 1);
       } else {
         console.error(`Request failed after ${retryCount} attempts:`, error);
@@ -156,7 +156,7 @@ class ApposaurSDK {
   }
 
   public async validateReferralCode(
-    request: ValidateReferralCodeRequest,
+    request: ValidateReferralCodeRequest
   ): Promise<boolean> {
     try {
       let requestBody = {
@@ -165,7 +165,7 @@ class ApposaurSDK {
       let data = await this.makeRequest(
         '/referral/validate',
         'POST',
-        requestBody,
+        requestBody
       );
       if (!data.referred_app_user_id) {
         return false;
@@ -173,7 +173,7 @@ class ApposaurSDK {
       await AsyncStorage.setItem(SDK_REFERRAL_CODE_KEY, request.code);
       await AsyncStorage.setItem(
         SDK_REFERRED_BY_USER_ID_KEY,
-        data.referred_app_user_id,
+        data.referred_app_user_id
       );
       return true;
     } catch (e) {
@@ -189,7 +189,7 @@ class ApposaurSDK {
 
   public async registerUser(request: RegisterSDKUserRequest): Promise<void> {
     const referredByUserId = await AsyncStorage.getItem(
-      SDK_REFERRED_BY_USER_ID_KEY,
+      SDK_REFERRED_BY_USER_ID_KEY
     );
 
     let apiRequest = {
@@ -203,15 +203,15 @@ class ApposaurSDK {
       const registerUserResponse = await this.makeRequest(
         '/referral/register',
         'POST',
-        apiRequest,
+        apiRequest
       );
       await AsyncStorage.setItem(
         SDK_APP_USER_ID_KEY,
-        registerUserResponse.app_user_id,
+        registerUserResponse.app_user_id
       );
       await AsyncStorage.setItem(
         SDK_APP_USER_CODE_KEY,
-        registerUserResponse.code,
+        registerUserResponse.code
       );
     } catch (e) {
       console.error('Error registering user:', e);
@@ -230,7 +230,7 @@ class ApposaurSDK {
 
   public async attributePurchase(
     productId: string,
-    transactionId: string,
+    transactionId: string
   ): Promise<void> {
     try {
       const appUserId = await AsyncStorage.getItem(SDK_APP_USER_ID_KEY);
@@ -239,7 +239,7 @@ class ApposaurSDK {
       }
 
       const processedTransactions = JSON.parse(
-        (await AsyncStorage.getItem(SDK_PROCESSED_TRANSACTIONS_KEY)) || '[]',
+        (await AsyncStorage.getItem(SDK_PROCESSED_TRANSACTIONS_KEY)) || '[]'
       );
       if (processedTransactions.includes(transactionId)) {
         return Promise.resolve();
@@ -262,7 +262,7 @@ class ApposaurSDK {
       processedTransactions.push(transactionId);
       await AsyncStorage.setItem(
         SDK_PROCESSED_TRANSACTIONS_KEY,
-        JSON.stringify(processedTransactions),
+        JSON.stringify(processedTransactions)
       );
     } catch (e) {
       console.error('Error handling purchase:', e);
@@ -270,13 +270,13 @@ class ApposaurSDK {
   }
 
   private async sendPurchaseEvent(
-    attributePurchaseRequest: any,
+    attributePurchaseRequest: any
   ): Promise<void> {
     try {
       await this.makeRequest(
         '/referral/purchase',
         'POST',
-        attributePurchaseRequest,
+        attributePurchaseRequest
       );
     } catch (e) {
       console.error('Error sending purchase event:', e);
@@ -295,10 +295,10 @@ class ApposaurSDK {
     try {
       const appUserId = await AsyncStorage.getItem(SDK_APP_USER_ID_KEY);
       if (!appUserId) {
-        return Promise.resolve({rewards: []});
+        return Promise.resolve({ rewards: [] });
       }
       if (!this.activeSubscriptionProductId) {
-        return Promise.resolve({rewards: []});
+        return Promise.resolve({ rewards: [] });
       }
       const url = `/referral/rewards?app_user_id=${appUserId}&product_id=${this.activeSubscriptionProductId}`;
       const rewards = await this.makeRequest(url, 'GET');
@@ -318,7 +318,7 @@ class ApposaurSDK {
       if (!this.activeSubscriptionProductId) {
         throw new Error('No active subscription found');
       }
-      await getProducts({skus: [this.activeSubscriptionProductId]});
+      await getProducts({ skus: [this.activeSubscriptionProductId] });
       const signRewardOfferRequest = {
         app_reward_id: rewardId,
         product_id: this.activeSubscriptionProductId,
@@ -327,7 +327,7 @@ class ApposaurSDK {
       const signedOffer = await this.makeRequest(
         '/referral/rewards/sign',
         'POST',
-        signRewardOfferRequest,
+        signRewardOfferRequest
       );
       // call iap purchase
       const purchaseOptions: RequestSubscription = {
