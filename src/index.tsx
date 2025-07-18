@@ -65,6 +65,15 @@ export interface RedeemRewardOfferResponse {
   success: boolean;
 }
 
+export interface GetReferralsResponse {
+  referrals: GetReferralsItem[];
+}
+
+export interface GetReferralsItem {
+  referral_to: string;
+  status: string;
+}
+
 class ApposaurSDK {
   private static instance: ApposaurSDK;
   // @ts-ignore
@@ -290,6 +299,22 @@ class ApposaurSDK {
       throw new Error('No purchases found');
     }
     return purchases[0]?.productId ?? '';
+  }
+
+  public async getReferrals(): Promise<GetReferralsResponse> {
+    try {
+      const appUserId = await AsyncStorage.getItem(SDK_APP_USER_ID_KEY);
+      if (!appUserId) {
+        return Promise.resolve({ referrals: [] });
+      }
+
+      const url = `/referral/fetch?app_user_id=${appUserId}`;
+      const referrals = await this.makeRequest(url, 'GET');
+      return referrals;
+    } catch (e) {
+      console.error('Error getting referrals:', e);
+      throw new Error('Failed to get referrals');
+    }
   }
 
   public async getRewards(): Promise<GetRewardsResponse> {

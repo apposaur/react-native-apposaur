@@ -78,7 +78,19 @@ const referralCode = await ApposaurSDK.getRegisteredUserReferralCode();
 console.log('User referral code:', referralCode);
 ```
 
-### 6. Manage Rewards
+### 6. Get User's Referrals
+
+```typescript
+// Get the list of referrals made by the current user
+const referralsData = await ApposaurSDK.getReferrals();
+console.log('User referrals:', referralsData.referrals);
+
+// Each referral contains:
+// - referral_to: Obfuscated User ID who was referred
+// - status: The current status of the referral (Accepted, Referred)
+```
+
+### 7. Manage Rewards
 
 ```typescript
 // Get available rewards for the user
